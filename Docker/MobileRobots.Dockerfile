@@ -29,6 +29,7 @@ RUN apt-get install -y apt-utils \
                        software-properties-common \
                        evince \
                        net-tools \
+                       terminator \
                        iputils-ping
 
 # Updating and Upgrading
@@ -73,12 +74,16 @@ RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 RUN apt install -y ros-humble-rmw-cyclonedds-cpp
 RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /root/.bashrc
 
-# Using Zenoh 
+# Installing Zenoh 
 RUN curl -L https://download.eclipse.org/zenoh/debian-repo/zenoh-public-key | gpg --dearmor --yes --output /etc/apt/keyrings/zenoh-public-key.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/zenoh-public-key.gpg] https://download.eclipse.org/zenoh/debian-repo/ /" |  tee -a /etc/apt/sources.list > /dev/null
 
 # Updating and Upgrading
 RUN apt-get update -y && apt-get upgrade -y
+
+# Installing Zenoh Executable
+RUN apt install -y zenoh-bridge-ros2dds
+
 ############################################################
 ##################### TurtleBot3 Setup #####################
 ############################################################
@@ -94,8 +99,8 @@ RUN apt update -y && apt install -y \
     git
 
 # Create workspace
-RUN mkdir -p /turtlebot3_ws/src
-WORKDIR /turtlebot3_ws/src
+RUN mkdir -p /home/turtlebot3_ws/src
+WORKDIR /home/turtlebot3_ws/src
 
 # Clone TurtleBot3 packages
 RUN git clone -b humble https://github.com/ROBOTIS-GIT/DynamixelSDK.git  && \
@@ -107,10 +112,15 @@ RUN git clone -b humble https://github.com/ROBOTIS-GIT/DynamixelSDK.git  && \
 # Build workspace
 SHELL ["/bin/bash", "-c"]
 RUN source /opt/ros/humble/setup.bash && \
-    cd /turtlebot3_ws && \
+    cd /home/turtlebot3_ws && \
     colcon build --symlink-install
+WORKDIR /home/turtlebot3_ws
 
 # Automatically source workspace + env configs
 RUN echo "export TURTLEBOT3_MODEL=waffle" >> /root/.bashrc
 RUN echo "source /usr/share/gazebo/setup.sh" >> /root/.bashrc
-RUN echo "source /turtlebot3_ws/install/setup.bash" >> /root/.bashrc
+RUN echo "source /home/turtlebot3_ws/install/setup.bash" >> /root/.bashrc
+
+# Clone Main Lab Repo 
+WORKDIR /home/
+RUN git clone https://github.com/THI-Robotics-Lab/Mobile-Robots-Practical-Lab.git

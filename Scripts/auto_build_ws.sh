@@ -29,6 +29,6 @@ build_ws_if_needed() {
 }
 
 build_ws_if_needed "my_ws"
-build_ws_if_needed "turtlebot_ws"
+build_ws_if_needed "turtlebot3_ws"
 
 echo "🚀 ROS2 workspace auto-build done."

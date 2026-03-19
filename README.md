@@ -26,6 +26,12 @@ cd Mobile-Robots-Practical-Lab
 
 ### 3️⃣ Run Docker Container
 
+Make the scripts executable
+
+```bash
+chmod +x ./Scripts/*.sh
+```
+
 Run shell script which start the container: 
 
 ```bash
